@@ -15,25 +15,36 @@ def h2_manhattan(state):
 
 
 def greedy_best_first(start, heuristic):
-    pq = [(heuristic(start), start, [])]
+    pq = []
     visited = set()
+    counter = 0  # tie-breaker
+
+    heapq.heappush(pq, (heuristic(start), counter, start, []))
+    counter += 1
 
     while pq:
-        _, state, path = heapq.heappop(pq)
+        _, _, state, path = heapq.heappop(pq)
 
         if state == GOAL_STATE:
             return path, len(visited)
+
+        if state in visited:
+            continue
 
         visited.add(state)
 
         for move in MOVES:
             if is_valid_move(blank_index(state), move):
                 next_state = apply_move(state, move)
-                if next_state not in visited:
-                    heapq.heappush(pq,
-                                   (heuristic(next_state),
-                                    next_state,
-                                    path+[move]))
+                heapq.heappush(
+                    pq,
+                    (heuristic(next_state),
+                     counter,
+                     next_state,
+                     path + [move])
+                )
+                counter += 1
+
     return None, len(visited)
 
 

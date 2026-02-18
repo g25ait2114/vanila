@@ -34,19 +34,24 @@ def simulated_annealing(start, heuristic,
                         T=1000, cooling=0.003):
 
     current = start
+    visited = set([start])
+    path = []
 
     while T > 1:
         if current == GOAL_STATE:
-            return current
+            return path, len(visited)
 
         move = random.choice(list(MOVES.keys()))
         if is_valid_move(blank_index(current), move):
             next_state = apply_move(current, move)
+            visited.add(next_state)
+
             delta = heuristic(next_state) - heuristic(current)
 
-            if delta < 0 or random.random() < math.exp(-delta/T):
+            if delta < 0 or random.random() < math.exp(-delta / T):
                 current = next_state
+                path.append(move)
 
         T *= (1 - cooling)
 
-    return current
+    return path, len(visited)
